@@ -1,56 +1,58 @@
-/*
- O que precisamos fazer? - Quando o usuário clicar no botão "Aplicar filtros", vamos filtrar cartas baseado na categoria e no preço máximo selecionado
-    OBJETIVO 1 - Criar a funcionalidade de filtrar as cartas
-        Passo 1 - pegar o botão de aplicar filtros do HTML e mandar para o JS
-        Passo 2 - escutar o clique no botão de aplicar filtros
-        Passo 3 - pegar os valores dos campos de categoria de preço
-        Passo 4 - para cada carta, verificar se ela deve ser mostrada ou escondida
-*/
-
-// Passo 1 - pegar o botão de aplicar filtros do HTML e mandar para o JS
+// Passo 1 - Pegar o botão de aplicar filtros
 const botaoFiltrar = document.querySelector('.btn-filtrar');
 
-// Passo 2 - escutar o clique no botão de aplicar filtros
-botaoFiltrar.addEventListener('click', function () {
+// Passo 2 - Adicionar o evento de clique no botão
+botaoFiltrar.addEventListener('click', aplicarFiltros);
 
-    // Passo 3 - pegar os valores dos campos de categoria de preço
-    const categoriaSelecionado = document.querySelector('#categoria').value;
-    const precoMaximoSelecionado = document.querySelector('#preco').value
+// Função principal chamada quando o botão é clicado
+function aplicarFiltros() {
+    const categoriaSelecionada = pegarCategoriaSelecionada();
+    const precoMaximoSelecionado = pegarPrecoMaximoSelecionado();
 
-
-    // Passo 4 - para cada carta, verificar se ela deve ser mostrada ou escondida baseando nos filtros que a pessoa digitou
     const cartas = document.querySelectorAll('.carta');
 
     cartas.forEach(function (carta) {
-        const categoriaCarta = carta.dataset.categoria;
-        const precoCarta = carta.dataset.preco;
-
-        let mostrarCarta = true;
-
-        console.log(categoriaSelecionado);
-
-        const temFiltroDeCategoria = categoriaSelecionado != ''
-
-        const cartaoNaoBateComFiltroCategoria = categoriaSelecionado.toLowerCase() != categoriaCarta.toLowerCase()
-
-        if (temFiltroDeCategoria && cartaoNaoBateComFiltroCategoria) {
-            mostrarCarta = false
-        };
-
-        const temFiltroDePreco = precoMaximoSelecionado != '';
-        const cartaoNaoBateComFiltroDePreco = parseFloat(precoCarta) > parseFloat(precoMaximoSelecionado);
-
-
-        if (temFiltroDePreco && cartaoNaoBateComFiltroDePreco) {
-            mostrarCarta = false;
-        };
-
-        if (mostrarCarta) {
-            carta.classList.add("mostrar");
-            carta.classList.remove("esconder");
-        } else {
-            carta.classList.remove('mostrar');
-            carta.classList.add('esconder')
-        };
+        const deveMostrar = verificarSeCartaPassaNosFiltros(carta, categoriaSelecionada, precoMaximoSelecionado);
+        mostrarOuEsconderCarta(carta, deveMostrar);
     });
-});
+}
+
+// Função para pegar o valor selecionado no campo de categoria
+function pegarCategoriaSelecionada() {
+    return document.querySelector('#categoria').value;
+}
+
+// Função para pegar o valor selecionado no campo de preço
+function pegarPrecoMaximoSelecionado() {
+    return document.querySelector('#preco').value;
+}
+
+// Função que verifica se uma carta deve ser mostrada ou não
+function verificarSeCartaPassaNosFiltros(carta, categoriaSelecionada, precoMaximoSelecionado) {
+    const categoriaCarta = carta.dataset.categoria.toLowerCase();
+    const precoCarta = parseFloat(carta.dataset.preco);
+
+    let passouCategoria = true;
+    let passouPreco = true;
+
+    if (categoriaSelecionada !== '') {
+        passouCategoria = categoriaCarta === categoriaSelecionada.toLowerCase();
+    }
+
+    if (precoMaximoSelecionado !== '') {
+        passouPreco = precoCarta <= parseFloat(precoMaximoSelecionado);
+    }
+
+    return passouCategoria && passouPreco;
+}
+
+// Função que mostra ou esconde a carta
+function mostrarOuEsconderCarta(carta, deveMostrar) {
+    if (deveMostrar) {
+        carta.classList.add('mostrar');
+        carta.classList.remove('esconder');
+    } else {
+        carta.classList.remove('mostrar');
+        carta.classList.add('esconder');
+    }
+}
